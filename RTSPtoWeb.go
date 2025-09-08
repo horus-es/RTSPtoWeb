@@ -9,6 +9,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const KEYFRAME_INTERVAL = 150 // Eran 10 sec
+
 func main() {
 	log.WithFields(logrus.Fields{
 		"module": "main",
