@@ -13,7 +13,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-//StreamServerRunStreamDo stream run do mux
+// StreamServerRunStreamDo stream run do mux
 func StreamServerRunStreamDo(streamID string, channelID string) {
 	var status int
 	defer func() {
@@ -61,12 +61,12 @@ func StreamServerRunStreamDo(streamID string, channelID string) {
 	}
 }
 
-//StreamServerRunStream core stream
+// StreamServerRunStream core stream
 func StreamServerRunStream(streamID string, channelID string, opt *ChannelST) (int, error) {
 	if url, err := url.Parse(opt.URL); err == nil && strings.ToLower(url.Scheme) == "rtmp" {
 		return StreamServerRunStreamRTMP(streamID, channelID, opt)
 	}
-	keyTest := time.NewTimer(20 * time.Second)
+	keyTest := time.NewTimer(KEYFRAME_INTERVAL * 2 * time.Second)
 	checkClients := time.NewTimer(20 * time.Second)
 	var start bool
 	var fps int
@@ -143,7 +143,7 @@ func StreamServerRunStream(streamID string, channelID string, opt *ChannelST) (i
 			}
 
 			if packetAV.IsKeyFrame {
-				keyTest.Reset(20 * time.Second)
+				keyTest.Reset(KEYFRAME_INTERVAL * 2 * time.Second)
 				if preKeyTS > 0 {
 					Storage.StreamHLSAdd(streamID, channelID, Seq, packetAV.Time-preKeyTS)
 					Seq = []*av.Packet{}
@@ -183,7 +183,7 @@ func StreamServerRunStream(streamID string, channelID string, opt *ChannelST) (i
 	}
 }
 func StreamServerRunStreamRTMP(streamID string, channelID string, opt *ChannelST) (int, error) {
-	keyTest := time.NewTimer(20 * time.Second)
+	keyTest := time.NewTimer(KEYFRAME_INTERVAL * 2 * time.Second)
 	checkClients := time.NewTimer(20 * time.Second)
 	OutgoingPacketQueue := make(chan *av.Packet, 1000)
 	Signals := make(chan int, 100)
@@ -272,7 +272,7 @@ func StreamServerRunStreamRTMP(streamID string, channelID string, opt *ChannelST
 			}
 
 			if packetAV.IsKeyFrame {
-				keyTest.Reset(20 * time.Second)
+				keyTest.Reset(KEYFRAME_INTERVAL * 2 * time.Second)
 				if preKeyTS > 0 {
 					Storage.StreamHLSAdd(streamID, channelID, Seq, packetAV.Time-preKeyTS)
 					Seq = []*av.Packet{}

@@ -71,7 +71,7 @@ func HTTPAPIServerStreamWebRTC(c *gin.Context) {
 		}
 		defer Storage.ClientDelete(safeContext.Param("uuid"), cid, safeContext.Param("channel"))
 		var videoStart bool
-		noVideo := time.NewTimer(10 * time.Second)
+		noVideo := time.NewTimer(KEYFRAME_INTERVAL * time.Second)
 		for {
 			select {
 			case <-noVideo.C:
@@ -82,7 +82,7 @@ func HTTPAPIServerStreamWebRTC(c *gin.Context) {
 				return
 			case pck := <-ch:
 				if pck.IsKeyFrame {
-					noVideo.Reset(10 * time.Second)
+					noVideo.Reset(KEYFRAME_INTERVAL * time.Second)
 					videoStart = true
 				}
 				if !videoStart {
